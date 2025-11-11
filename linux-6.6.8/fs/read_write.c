@@ -705,10 +705,16 @@ ssize_t ksys_pwrite64(unsigned int fd, const char __user *buf,
 
 	f = fdget(fd);
 
-    if (conn_ksys_pwrite64 && f.file && !strncmp(f.file->f_path.dentry->d_name.name, "nvme", 4)) {
-        fdput(f);
-        return (*conn_ksys_pwrite64)(fd, buf, count, pos);
-    }
+	// *** profiling module entry point ***	
+	// ====================================
+	
+    	if (conn_ksys_pwrite64 && f.file && (!strncmp(f.file->f_path.dentry->d_name.name, "nvme", 4) || !strncmp(f.file->f_path.dentry->d_name.name, "md", 2))) {
+        	fdput(f);
+        	return (*conn_ksys_pwrite64)(fd, buf, count, pos);
+	} else {
+		// printk(KERN_ERR "[%s] call here?\n", __func__);
+	}
+	// ====================================
 
 	if (f.file) {
 		ret = -ESPIPE;

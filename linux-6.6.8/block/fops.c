@@ -34,12 +34,14 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
 	return opf;
 }
 
-static bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
+bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
 			      struct iov_iter *iter)
 {
 	return pos & (bdev_logical_block_size(bdev) - 1) ||
 		!bdev_iter_is_aligned(bdev, iter);
 }
+EXPORT_SYMBOL(blkdev_dio_unaligned); // raid-0 profiling module
+				     // remove static, add EXPORT_SYMBOL
 
 #define DIO_INLINE_BIO_VECS 4
 
@@ -159,7 +161,7 @@ static void blkdev_bio_end_io(struct bio *bio)
 	}
 }
 
-static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
 		unsigned int nr_pages)
 {
 	struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
@@ -272,6 +274,8 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
 	bio_put(&dio->bio);
 	return ret;
 }
+EXPORT_SYMBOL(__blkdev_direct_IO); // raid-0 profiling module
+		 		   // remove static, add EXPORT_SYMBOL
 
 static void blkdev_bio_end_io_async(struct bio *bio)
 {
@@ -298,7 +302,7 @@ static void blkdev_bio_end_io_async(struct bio *bio)
 	}
 }
 
-static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
+ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
 					struct iov_iter *iter,
 					unsigned int nr_pages)
 {
@@ -362,6 +366,8 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
 	}
 	return -EIOCBQUEUED;
 }
+EXPORT_SYMBOL(__blkdev_direct_IO_async); // raid-0 profiling module
+					 // remove static, add EXPORT_SYMBOL
 
 static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 {
@@ -629,10 +635,15 @@ blkdev_direct_write(struct kiocb *iocb, struct iov_iter *from)
 	return written;
 }
 
-static ssize_t blkdev_buffered_write(struct kiocb *iocb, struct iov_iter *from)
+ssize_t blkdev_buffered_write(struct kiocb *iocb, struct iov_iter *from)
 {
 	return iomap_file_buffered_write(iocb, from, &blkdev_iomap_ops);
 }
+EXPORT_SYMBOL(blkdev_buffered_write); // raid-0 profiling module
+		 		      // remove static, add EXPORT_SYMBOL
+
+ssize_t (*conn_blkdev_write_iter)(struct kiocb *iocb, struct iov_iter *from);
+EXPORT_SYMBOL(conn_blkdev_write_iter);
 
 /*
  * Write data to the block device.  Only intended for the block device itself
@@ -649,6 +660,13 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	loff_t size = bdev_nr_bytes(bdev);
 	size_t shorted = 0;
 	ssize_t ret;
+
+	// *** profiling module entry point ***
+	// ====================================
+	if (conn_blkdev_write_iter && file && (!strncmp(file->f_path.dentry->d_name.name, "nvme", 4) || !strncmp(file->f_path.dentry->d_name.name, "md", 2))) {
+		return conn_blkdev_write_iter(iocb, from);
+	}
+	// ====================================
 
 	if (bdev_read_only(bdev))
 		return -EPERM;

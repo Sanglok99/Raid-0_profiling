@@ -2764,6 +2764,8 @@ int kiocb_invalidate_pages(struct kiocb *iocb, size_t count)
 	return invalidate_inode_pages2_range(mapping, pos >> PAGE_SHIFT,
 					     end >> PAGE_SHIFT);
 }
+EXPORT_SYMBOL(kiocb_invalidate_pages); // raid-0 profiling module
+		                       // add EXPORT_SYMBOL
 
 /**
  * generic_file_read_iter - generic filesystem read routine
@@ -3845,7 +3847,7 @@ EXPORT_SYMBOL(read_cache_page_gfp);
 /*
  * Warn about a page cache invalidation failure during a direct I/O write.
  */
-static void dio_warn_stale_pagecache(struct file *filp)
+void dio_warn_stale_pagecache(struct file *filp)
 {
 	static DEFINE_RATELIMIT_STATE(_rs, 86400 * HZ, DEFAULT_RATELIMIT_BURST);
 	char pathname[128];
@@ -3861,6 +3863,8 @@ static void dio_warn_stale_pagecache(struct file *filp)
 			current->comm);
 	}
 }
+EXPORT_SYMBOL(dio_warn_stale_pagecache); // raid-0 profiling module
+		 			 // remove static, add EXPORT_SYMBOL
 
 void kiocb_invalidate_post_direct_write(struct kiocb *iocb, size_t count)
 {
@@ -3873,6 +3877,9 @@ void kiocb_invalidate_post_direct_write(struct kiocb *iocb, size_t count)
 		dio_warn_stale_pagecache(iocb->ki_filp);
 }
 
+
+EXPORT_SYMBOL(kiocb_invalidate_post_direct_write); // raid-0 profiling module
+                                         	   // add EXPORT_SYMBOL
 ssize_t
 generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
 {

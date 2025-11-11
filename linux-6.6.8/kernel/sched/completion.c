@@ -77,7 +77,7 @@ void complete_all(struct completion *x)
 }
 EXPORT_SYMBOL(complete_all);
 
-static inline long __sched
+inline long __sched
 do_wait_for_common(struct completion *x,
 		   long (*action)(long), long timeout, int state)
 {
@@ -103,6 +103,8 @@ do_wait_for_common(struct completion *x,
 		x->done--;
 	return timeout ?: 1;
 }
+EXPORT_SYMBOL(do_wait_for_common); // raid-0 profiling
+                                   // remove static, add EXPORT_SYMBOL
 
 static inline long __sched
 __wait_for_common(struct completion *x,

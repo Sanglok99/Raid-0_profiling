@@ -43,6 +43,8 @@ static int __read_mostly sysctl_hung_task_check_count = PID_MAX_LIMIT;
  * Zero means infinite timeout - no checking done:
  */
 unsigned long __read_mostly sysctl_hung_task_timeout_secs = CONFIG_DEFAULT_HUNG_TASK_TIMEOUT;
+EXPORT_SYMBOL(sysctl_hung_task_timeout_secs); // raid-0 profiling module
+                                              // add EXPORT_SYMBOL
 
 /*
  * Zero (default value) means use sysctl_hung_task_timeout_secs:

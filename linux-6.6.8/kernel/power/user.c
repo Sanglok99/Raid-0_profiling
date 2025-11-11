@@ -43,6 +43,8 @@ int is_hibernate_resume_dev(dev_t dev)
 {
 	return hibernation_available() && snapshot_state.dev == dev;
 }
+EXPORT_SYMBOL(is_hibernate_resume_dev); // raid-0 profiling module
+                                        // add EXPORT_SYMBOL
 
 static int snapshot_open(struct inode *inode, struct file *filp)
 {

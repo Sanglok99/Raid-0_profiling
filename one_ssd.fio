@@ -1,7 +1,7 @@
 ; fio-seq-write.job for fiotest
 
 [global]
-filename=/dev/md126
+filename=/dev/nvme2n1
 ;directory=/mnt/test
 rw=randwrite
 bs=4K
