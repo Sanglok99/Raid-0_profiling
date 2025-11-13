@@ -95,6 +95,20 @@ KTDEC(complete_acquire);
 KTDEC(raw_spin_lock_irq);
 KTDEC(complete_release);
 
+KTDEC(__prepare_to_swait);
+KTDEC(__set_current_state);
+KTDEC(__finish_swait);
+KTDEC(action);
+
+KTDEC(first_schedule);
+KTDEC(timer_setup_on_stack);
+KTDEC(__mod_timer);
+KTDEC(second_schedule);
+KTDEC(del_timer_sync);
+KTDEC(destroy_timer_on_stack);
+
+KTDEC(io_schedule_timeout);
+
 static int __init pxt4_init_fs(void)
 {
     printk("start raid0 module\n");
@@ -140,14 +154,21 @@ static void __exit pxt4_exit_fs(void)
     ktprint(4, submit_bio_wait);
     // ktprint(4, bio_release_pages);
 
-    ktprint(5, submit_bio);
-    ktprint(5, wait_for_completion_io);
+    // ktprint(5, submit_bio);
+    // ktprint(5, wait_for_completion_io);
     ktprint(5, __wait_for_common);
 
-    ktprint(6, might_sleep);
-    ktprint(6, complete_acquire);
+    // ktprint(6, might_sleep);
+    // ktprint(6, complete_acquire);
     ktprint(6, raw_spin_lock_irq);
-    ktprint(6, complete_release);
+    // ktprint(6, complete_release);
+
+    // ktprint(7, __prepare_to_swait);
+    // ktprint(7, __set_current_state);
+    // ktprint(7, __finish_swait);
+    ktprint(7, action);
+
+    ktprint(8, io_schedule_timeout);
 
     printk("end raid0 module\n");
 }

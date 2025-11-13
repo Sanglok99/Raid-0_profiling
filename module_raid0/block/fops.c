@@ -166,12 +166,12 @@ int my_submit_bio_wait(struct bio *bio)
     bio->bi_end_io = my_submit_bio_wait_endio;
     bio->bi_opf |= REQ_SYNC;
 
-    ktget(&stopwatch[0]); // profiling code
+    // ktget(&stopwatch[0]); // profiling code
 
     submit_bio(bio);
 
-    ktget(&stopwatch[1]); // profiling code
-    ktput(stopwatch, submit_bio); // profiling code
+    // ktget(&stopwatch[1]); // profiling code
+    // ktput(stopwatch, submit_bio); // profiling code
 
     /* Prevent hang_check timer from firing at us during very long I/O */
     hang_check = sysctl_hung_task_timeout_secs;

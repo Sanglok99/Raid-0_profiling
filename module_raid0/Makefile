@@ -10,7 +10,7 @@ module_raid0-y	:= super.o
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
-module_raid0-y	+= fs/read_write.o calclock.o block/fops.o block/bio.o kernel/sched/completion.o
+module_raid0-y	+= fs/read_write.o calclock.o block/fops.o block/bio.o kernel/sched/completion.o kernel/sched/core.o kernel/time/timer.o
 
 default:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules

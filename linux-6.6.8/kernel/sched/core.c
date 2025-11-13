@@ -8996,6 +8996,7 @@ int io_schedule_prepare(void)
 	blk_flush_plug(current->plug, true);
 	return old_iowait;
 }
+EXPORT_SYMBOL(io_schedule_prepare); // raid-0 profiling
 
 void io_schedule_finish(int token)
 {

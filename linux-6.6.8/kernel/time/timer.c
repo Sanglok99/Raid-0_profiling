@@ -1009,7 +1009,7 @@ static struct timer_base *lock_timer_base(struct timer_list *timer,
 #define MOD_TIMER_REDUCE		0x02
 #define MOD_TIMER_NOTPENDING		0x04
 
-static inline int
+inline int
 __mod_timer(struct timer_list *timer, unsigned long expires, unsigned int options)
 {
 	unsigned long clk = 0, flags, bucket_expiry;
@@ -1135,6 +1135,8 @@ out_unlock:
 
 	return ret;
 }
+EXPORT_SYMBOL(__mod_timer); // raid-0 profiling
+                            // remove static, add EXPORT_SYMBOL
 
 /**
  * mod_timer_pending - Modify a pending timer's timeout
