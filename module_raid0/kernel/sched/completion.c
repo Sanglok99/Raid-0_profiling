@@ -50,7 +50,9 @@ void __my_finish_swait(struct swait_queue_head *q, struct swait_queue *wait)
 KTDEF(__prepare_to_swait);
 KTDEF(__set_current_state);
 KTDEF(__finish_swait);
+KTDEF(second_raw_spin_unlock_irq);
 KTDEF(action);
+KTDEF(second_raw_spin_lock_irq);
 static inline long __sched
 my_do_wait_for_common(struct completion *x,
 		   long (*action)(long), long timeout, int state)
@@ -66,38 +68,48 @@ my_do_wait_for_common(struct completion *x,
 				break;
 			}
             
-            // ktget(&stopwatch[0]); // profiling code
+            ktget(&stopwatch[0]); // profiling code
 
 			__my_prepare_to_swait(&x->wait, &wait);
 
-            // ktget(&stopwatch[1]); // profiling code
-            // ktput(stopwatch, __prepare_to_swait); // profiling code
+            ktget(&stopwatch[1]); // profiling code
+            ktput(stopwatch, __prepare_to_swait); // profiling code
 
-            // ktget(&stopwatch[0]); // profiling code
+            ktget(&stopwatch[0]); // profiling code
 
 			__set_current_state(state);
 
-            // ktget(&stopwatch[1]); // profiling code
-            // ktput(stopwatch, __set_current_state); // profiling code
+            ktget(&stopwatch[1]); // profiling code
+            ktput(stopwatch, __set_current_state); // profiling code
+            
+            ktget(&stopwatch[0]); // profiling code
 
 			raw_spin_unlock_irq(&x->wait.lock);
 
             ktget(&stopwatch[1]); // profiling code
+            ktput(stopwatch, second_raw_spin_unlock_irq); // profiling code
+            
+            ktget(&stopwatch[0]); // profiling code
                                  
 			timeout = action(timeout);
 
             ktget(&stopwatch[1]); // profiling code
             ktput(stopwatch, action); // profiling code
+            
+            ktget(&stopwatch[0]); // profiling code
 
 			raw_spin_lock_irq(&x->wait.lock);
+
+            ktget(&stopwatch[1]); // profiling code
+            ktput(stopwatch, second_raw_spin_lock_irq); // profiling code
 		} while (!x->done && timeout);
 
-        // ktget(&stopwatch[0]); // profiling code
+        ktget(&stopwatch[0]); // profiling code
                           
 		__my_finish_swait(&x->wait, &wait);
 
-        // ktget(&stopwatch[1]); // profiling code
-        // ktput(stopwatch, __finish_swait); // profiling code
+        ktget(&stopwatch[1]); // profiling code
+        ktput(stopwatch, __finish_swait); // profiling code
 
 		if (!x->done)
 			return timeout;
@@ -110,6 +122,8 @@ my_do_wait_for_common(struct completion *x,
 KTDEF(might_sleep);
 KTDEF(complete_acquire);
 KTDEF(raw_spin_lock_irq);
+KTDEF(do_wait_for_common);
+KTDEF(raw_spin_unlock_irq);
 KTDEF(complete_release);
 static inline long __sched
 __my_wait_for_common_internal(struct completion *x,
@@ -133,11 +147,23 @@ __my_wait_for_common_internal(struct completion *x,
     ktget(&stopwatch[0]); // profiling code
 
     raw_spin_lock_irq(&x->wait.lock);
+    
+    ktget(&stopwatch[1]); // profiling code
+    ktput(stopwatch, raw_spin_lock_irq); // profiling code
+    
+    ktget(&stopwatch[0]); // profiling code
+    
     timeout = my_do_wait_for_common(x, action, timeout, state);
+    
+    ktget(&stopwatch[1]); // profiling code
+    ktput(stopwatch, do_wait_for_common); // profiling code
+    
+    ktget(&stopwatch[0]); // profiling code
+    
     raw_spin_unlock_irq(&x->wait.lock);
 
     ktget(&stopwatch[1]); // profiling code
-    ktput(stopwatch, raw_spin_lock_irq); // profiling code
+    ktput(stopwatch, raw_spin_unlock_irq); // profiling code
 
     // ktget(&stopwatch[0]); // profiling code
  

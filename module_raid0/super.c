@@ -93,12 +93,16 @@ KTDEC(__wait_for_common);
 KTDEC(might_sleep);
 KTDEC(complete_acquire);
 KTDEC(raw_spin_lock_irq);
+KTDEC(do_wait_for_common);
+KTDEC(raw_spin_unlock_irq);
 KTDEC(complete_release);
 
 KTDEC(__prepare_to_swait);
 KTDEC(__set_current_state);
 KTDEC(__finish_swait);
+KTDEC(second_raw_spin_unlock_irq);
 KTDEC(action);
+KTDEC(second_raw_spin_lock_irq);
 
 KTDEC(first_schedule);
 KTDEC(timer_setup_on_stack);
@@ -161,12 +165,16 @@ static void __exit pxt4_exit_fs(void)
     // ktprint(6, might_sleep);
     // ktprint(6, complete_acquire);
     ktprint(6, raw_spin_lock_irq);
+    ktprint(6, do_wait_for_common);
+    ktprint(6, raw_spin_unlock_irq);
     // ktprint(6, complete_release);
 
-    // ktprint(7, __prepare_to_swait);
-    // ktprint(7, __set_current_state);
-    // ktprint(7, __finish_swait);
+    ktprint(7, __prepare_to_swait);
+    ktprint(7, __set_current_state);
+    ktprint(7, __finish_swait);
+    ktprint(7, second_raw_spin_unlock_irq);
     ktprint(7, action);
+    ktprint(7, second_raw_spin_lock_irq);
 
     ktprint(8, io_schedule_timeout);
 

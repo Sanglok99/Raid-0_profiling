@@ -1375,7 +1375,6 @@ int submit_bio_wait(struct bio *bio)
 
 	return blk_status_to_errno(bio->bi_status);
 }
-EXPORT_SYMBOL(submit_bio_wait);
 
 void __bio_advance(struct bio *bio, unsigned bytes)
 {
